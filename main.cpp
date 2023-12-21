@@ -132,14 +132,18 @@ int main() {
     original.copyTo(another_copy);
 
     Mat scanned = wrap_perspective(another_copy, contour_to_rect(rect_contour[0], ratio));
-    imshow("scanned", scanned);
+    Mat dst;
+    Mat thresholded;
+    cvtColor(scanned, dst, COLOR_BGR2GRAY);
+    threshold(dst, thresholded, 160, 255, THRESH_BINARY);
+    imwrite("res.jpg", thresholded);
 
     auto* api = new TessBaseAPI();
     if (api->Init(NULL, "eng")) {
         fprintf(stderr, "Could not initialize tesseract.\n");
         exit(1);
     }
-    Pix *image = pixRead("./tjs.jpg");
+    Pix *image = pixRead("./res.jpg");
     api->SetImage(image);
     cout << api->GetUTF8Text() << endl;
 
